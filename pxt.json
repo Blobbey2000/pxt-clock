@@ -8,7 +8,8 @@
     "files": [
         "README.md",
         "main.blocks",
-        "main.ts"
+        "main.ts",
+        "clock.ts"
     ],
     "testFiles": [
         "test.ts"
