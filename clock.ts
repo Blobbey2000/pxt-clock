@@ -1,16 +1,8 @@
 let hoursOfTheClock = 0
 let minutesOfTheClock = 0
+let secondsOfTheClock = 0
 let speedOfTheClock = 1000
 let clockOnOrOff = false
-let amPmTime = ""
-let amOrPm = 2
-
-enum AMPM {
-    //% block="am"
-    AM,
-    //% block="pm"
-    PM
-}
 
 //% color="#C009AF"
 //% icon="\uf017"
@@ -21,43 +13,38 @@ namespace Clock {
     /**
      * Creates a customizable clock.
      */
-    //% block="set clock time to $hour : $minute $ampm"
+    //% block="set clock time to $hour : $minute : $second"
     //% group="Clock"
     //% weight=2
     //% hour.min=1 hour.max=12
     //% minute.min=0 minute.max=59
-    export function makeClock(hour: number, minute: number, ampm: AMPM) {
-        hoursOfTheClock = hour
-        minutesOfTheClock = minute
-        clockOnOrOff = true
-        if (ampm == 0) {
-            amPmTime = "am"
-            amOrPm = ampm
-        } else if (ampm == 1) {
-            amPmTime = "pm"
-            amOrPm = ampm
-        }
-
+    //% second.min=0 second.max=59
+    export function makeClock(hour: number, minute: number, second: number) {
+    hoursOfTheClock = hour
+    minutesOfTheClock = minute
+    secondsOfTheClock = second
+    clockOnOrOff = true
+    
     }
-
+    
     /**
-     * Returns the clock time.
+     * Returns the clock time. Expanding the block will give the option to make seconds visible.
      */
-    //% block
+    //% block="clock time || with seconds $visible"
+    //% duration.shadow=timePicker
+    //% expandableArgumentMode="enabled"
     //% group="Clock"
     //% weight=1
-    export function clockTime() {
-        if (amOrPm == 0) {
-            if (minutesOfTheClock < 10) {
-                return hoursOfTheClock + ":" + "0" + minutesOfTheClock + "am";
+    export function clockTime(visible?: boolean) {
+        if (visible) {
+            if (secondsOfTheClock < 10 && minutesOfTheClock < 10) {
+                return hoursOfTheClock + ":" + "0" + minutesOfTheClock + ":" + "0" + secondsOfTheClock;
+            } else if (secondsOfTheClock < 10) {
+                return hoursOfTheClock + ":" + minutesOfTheClock + ":" + "0" + secondsOfTheClock;
+            } else if (minutesOfTheClock < 10) {
+                return hoursOfTheClock + ":" + "0" + minutesOfTheClock + ":" + secondsOfTheClock;
             } else {
-                return hoursOfTheClock + ":" + minutesOfTheClock + "am";
-            }
-        } else if (amOrPm == 1) {
-            if (minutesOfTheClock < 10) {
-                return hoursOfTheClock + ":" + "0" + minutesOfTheClock + "pm";
-            } else {
-                return hoursOfTheClock + ":" + minutesOfTheClock + "pm";
+                return hoursOfTheClock + ":" + minutesOfTheClock + ":" + secondsOfTheClock;
             }
         } else {
             if (minutesOfTheClock < 10) {
@@ -66,20 +53,19 @@ namespace Clock {
                 return hoursOfTheClock + ":" + minutesOfTheClock;
             }
         }
-
     }
 
     /**
-     * Changes the speed at which the clock runs.
+     * Determines the amount of time it takes for one second to pass, and thus changes the speed at which the clock runs.
      */
-    //% block="set clock speed to $speed ms"
+    //% block="set one second duration to $speed ms"
     //% group="Clock Settings"
     //% weight=5
     //% speed.defl=1000
     export function clockSpeed(speed: number) {
         speedOfTheClock = speed
     }
-
+    
     /**
      * Turns the clock on and off.
      */
@@ -106,7 +92,10 @@ namespace Clock {
 
 }
 
-forever(function () {
+forever(function() {
+    if (secondsOfTheClock < 0) {
+        secondsOfTheClock = secondsOfTheClock * -1
+    }
     if (minutesOfTheClock < 0) {
         minutesOfTheClock = minutesOfTheClock * -1
     }
@@ -118,18 +107,18 @@ forever(function () {
     }
     pause(speedOfTheClock)
     if (clockOnOrOff) {
-        minutesOfTheClock += 1
+        secondsOfTheClock += 1
+        if (secondsOfTheClock >= 60) {
+            secondsOfTheClock = 0
+            minutesOfTheClock += 1
+        }
         if (minutesOfTheClock >= 60) {
             minutesOfTheClock = 0
             hoursOfTheClock += 1
         }
         if (hoursOfTheClock >= 13) {
             hoursOfTheClock = 1
-            if (amOrPm == 0) {
-                amOrPm = 1
-            } else if (amOrPm == 1) {
-                amOrPm = 0
-            }
         }
+
     }
 })
