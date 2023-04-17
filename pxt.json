@@ -1,6 +1,6 @@
 {
     "name": "pxt-clock",
-    "version": "1.9.3",
+    "version": "1.10.4",
     "description": "",
     "dependencies": {
         "device": "*"
